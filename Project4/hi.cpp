@@ -2,6 +2,7 @@
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+//入口函数
 int WINAPI WinMain(
 	HINSTANCE hInstace,//参数直接赋值到下列
 	HINSTANCE hPreInstance,
@@ -57,16 +58,17 @@ int WINAPI WinMain(
 	ShowWindow(hwnd, iCmdShow);
 	UpdateWindow(hwnd);//相当于F5刷新窗口
 
+	//从消息队列中检索消息
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		TranslateMessage(&msg);//发送消息
+		DispatchMessage(&msg);//分发消息
 	}
 	return msg.wParam;
 
 }
 
-//窗口过程：
+//窗口过程代码：
 LRESULT CALLBACK WndProc(
 	HWND hwnd,
 	UINT message,
@@ -84,9 +86,22 @@ LRESULT CALLBACK WndProc(
 	case WM_PAINT://窗口绘制
 		hdc = BeginPaint(hwnd, &ps);
 		GetClientRect(hwnd, &rect);//获取客户区的填充信息rect
-		DrawText(hdc, TEXT("大家好，这是我的第一个窗口"), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		//DrawText(hdc, TEXT("大家好，这是我的第一个窗口"), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		//改用TextOut：
+		TextOut(hdc,400,300,TEXT("I love you"), 10);
+
 		EndPaint(hwnd, &ps);
 		return 0;
+
+	case WM_LBUTTONDOWN:
+		MessageBox(hwnd,TEXT("哎呀，我丫的被按了"), TEXT("好舒服"), MB_OK);
+		return 0;
+
+	case WM_CLOSE:
+		if (MessageBox(hwnd, TEXT("请问是否真的要关闭我？"), TEXT("请确认"), MB_YESNO) == IDYES)
+			DestroyWindow(hwnd);
+		else
+			return 0;
 
 	case WM_DESTROY://退出消息
 		PostQuitMessage(0);//退出返回代码
