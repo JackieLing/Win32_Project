@@ -1,4 +1,6 @@
 #include<windows.h>
+#include<strsafe.h>
+//#define LINEHEIGH 15
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -80,15 +82,31 @@ LRESULT CALLBACK WndProc(
 	HDC hdc;
 	PAINTSTRUCT ps;
 	RECT rect;
+	TCHAR szBuffer[128];
+	int i;
+	size_t iTarget;
+	static int cxChar, cyChar;
+	TEXTMETRIC tm;
+
 
 	switch (message)
 	{
+
+	case WM_CREATE:
+		hdc = GetDC(hwnd);
+		GetTextMetrics(hdc, &tm);//自动获取尺寸值，不要去自己猜测尺寸值
+		cxChar = tm.tmAveCharWidth;
+		cyChar = tm.tmHeight + tm.tmExternalLeading;
+		ReleaseDC(hwnd, hdc);
+
 	case WM_PAINT://窗口绘制
 		hdc = BeginPaint(hwnd, &ps);
-		GetClientRect(hwnd, &rect);//获取客户区的填充信息rect
-		//DrawText(hdc, TEXT("大家好，这是我的第一个窗口"), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-		//改用TextOut：
-		TextOut(hdc,400,300,TEXT("I love you"), 10);
+		for (i = 0; i < 10; i++)
+		{
+			StringCchPrintf(szBuffer,128,TEXT("%d:%s"), i + 1, TEXT("I love you!"));
+			StringCchLength(szBuffer, 128, &iTarget);
+			TextOut(hdc,cxChar,i*cyChar,szBuffer,iTarget);
+		}
 
 		EndPaint(hwnd, &ps);
 		return 0;
