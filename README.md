@@ -6,7 +6,9 @@
 
 # 一、概念
 
-> 先有编程后有OS，学习Windows编程主要是积累Windows API
+> 先有编程后有OS，学习Windows编程主要是积累Windows API。
+>
+> Windows编程的游戏规则：在之前的编程中，我们都是用户来调用函数名进行相应函数的调用执行，Windows编程则是用户发送消息告诉Windows操作系统，由WIndows系统通过消息队列来间接调用我们的函数。
 
 **Windows编程**是基于Windows系统环境下的编程，利用微软提供的`Windows API`调用接口实现用户与硬件的交互；这门课在大学期间没有接触过，大学接触的C语言、C++只是一种高级编程语言，相当于在背单词，而Windows编程相当于在写文章，进行自由创作；大学学习C和C++只是基于黑窗口Dos编程，进行简单的思维训练。
 
@@ -157,4 +159,83 @@ LRESULT CALLBACK WndProc(
 客户区和非客户区：
 
 ![image-20220427103017422](https://gitee.com/jackieling/xp01/raw/master/202204271120882.png)
+
+
+
+```c++
+##加了一个模块：左键单击提醒
+	case WM_LBUTTONDOWN:
+		MessageBox(hwnd,TEXT("哎呀，我丫的被按了"), TEXT("好舒服"), MB_OK);
+		return 0;
+```
+
+
+
+![image-20220427133819792](https://gitee.com/jackieling/xp01/raw/master/202204271432059.png)
+
+![image-20220427135341241](https://gitee.com/jackieling/xp01/raw/master/202204271432060.png)
+
+## 总结：
+
+> ​		在之前的编程中，我们都是用户来调用函数名进行相应函数的调用执行，Windows编程则是用户发送消息告诉Windows操作系统，由WIndows系统通过消息队列来间接调用我们的函数。
+>
+> 我们写的代码包含两部分：
+>
+> + 入口函数WinMain：
+>
+>   + 注册窗口类
+>   + 创建窗口
+>   + 从消息队列中检索消息、分配消息
+>
+> + 窗口过程代码WndProc
+>
+>   + 三个case 响应操作
+>
+>     
+
+# 三、文本输出
+
+> Windows三大核心部件：
+>
+> 1. Kernel
+> 2. GDI
+> 3. user
+
+GDI：图形设备接口，使应用程序能够在视频显示器和打印机上使用图形和格式化文本。
+
+使用GDI之前需要设置设备环境句柄,这个设备环境句柄就是GDI函数的通行证，只有有了这个句柄，才能知道如何调用GDI函数：
+
+```c++
+方法一：
+hdc = BeginPaint(hwnd, &ps);
+		GetClientRect(hwnd, &rect);//获取客户区的填充信息rect
+		xxx;//使用GDI函数
+EndPaint(hwnd, &ps);
+```
+
+```c++
+方法二：
+hdc=GetDC(hwnd);
+	xxx;//使用GDI函数
+ReleaseDC(hwnd,hdc);
+```
+
+![image-20220427142524099](https://gitee.com/jackieling/xp01/raw/master/202204271432061.png)
+
+```c++
+//实现上图代码：
+case WM_PAINT://窗口绘制
+		hdc = BeginPaint(hwnd, &ps);
+		GetClientRect(hwnd, &rect);//获取客户区的填充信息rect
+		//DrawText(hdc, TEXT("大家好，这是我的第一个窗口"), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		//改用TextOut：
+		TextOut(hdc,400,300,TEXT("I love you"), 10);//自己用勾股定理计算
+
+		EndPaint(hwnd, &ps);
+		return 0;
+```
+
+# 四、使用字符串处理
+
+![image-20220427142734573](https://gitee.com/jackieling/xp01/raw/master/202204271432062.png)
 
